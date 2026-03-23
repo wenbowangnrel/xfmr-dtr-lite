@@ -239,8 +239,8 @@ def plot_results(
         fine_t_svc = [r["time_hours"]    for r in service_fine]
         fine_h_svc = [r["hot_spot_temp_c"] for r in service_fine]
 
-        ax1.plot(fine_t_pwr, fine_h_pwr, label="Power hot-spot (25 MVA)",   color="tab:blue")
-        ax1.plot(fine_t_svc, fine_h_svc, label="Service hot-spot (500 kVA)", color="tab:orange")
+        ax1.plot(fine_t_pwr, fine_h_pwr, label="Power xfmr hot-spot",   color="tab:blue")
+        ax1.plot(fine_t_svc, fine_h_svc, label="Service xfmr hot-spot", color="tab:orange")
 
         # Load drawn as a staircase: each hourly value is held constant until
         # the next hour, then jumps instantaneously -- making the thermal lag
@@ -251,8 +251,8 @@ def plot_results(
     else:
         power_hot_spot   = [r["hot_spot_temp_c"] for r in power_results]
         service_hot_spot = [r["hot_spot_temp_c"] for r in service_results]
-        ax1.plot(hours, power_hot_spot,   label="Power hot-spot (25 MVA)",   color="tab:blue")
-        ax1.plot(hours, service_hot_spot, label="Service hot-spot (500 kVA)", color="tab:orange")
+        ax1.plot(hours, power_hot_spot,   label="Power xfmr hot-spot",   color="tab:blue")
+        ax1.plot(hours, service_hot_spot, label="Service xfmr hot-spot", color="tab:orange")
         ax1r = ax1.twinx()
         ax1r.plot(hours, load, color="tab:gray", linewidth=1.5, linestyle="--", label="Applied load")
 
@@ -271,14 +271,14 @@ def plot_results(
 
     # ── Panel 2: thermal loading limit (left) + ambient temperature (right) ───
     ax2 = axes[1]
-    ax2.plot(hours, power_limit,   label="Power thermal limit (25 MVA)",   color="tab:blue",   linestyle="--")
-    ax2.plot(hours, service_limit, label="Service thermal limit (500 kVA)", color="tab:orange", linestyle="--")
+    ax2.plot(hours, power_limit,   label="Power xfmr thermal limit",   color="tab:blue",   linestyle="--")
+    ax2.plot(hours, service_limit, label="Service xfmr thermal limit", color="tab:orange", linestyle="--")
     ax2.set_ylabel("Thermal loading limit [pu]")
     ax2.set_xlabel("Hour of day")
     ax2.grid(True, alpha=0.3)
 
     ax2r = ax2.twinx()
-    ax2r.plot(hours, ambient, color="tab:green", linewidth=1.5, linestyle="-.", label="Ambient temp")
+    ax2r.plot(hours, ambient, color="tab:green", linewidth=1.5, linestyle="-.", label="Ambient temperature")
     ax2r.set_ylabel("Ambient temperature [°C]", color="tab:green")
     ax2r.tick_params(axis="y", labelcolor="tab:green")
 
