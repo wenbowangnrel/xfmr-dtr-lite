@@ -125,6 +125,65 @@ def simulate(params: dict, profile: list[dict], dt_hours: float = 1.0) -> list[d
     return results
 
 
+def simulate_fine(params: dict, profile: list[dict], dt_minutes: float = 5.0) -> list[dict]:
+    """High-resolution simulation (sub-hourly steps) to visualise thermal lag.
+
+    The profile is hourly; this function sub-steps each hour at dt_minutes
+    resolution, holding load and ambient constant within each hour (step
+    function). The result is a fine-grained time series that shows the
+    gradual temperature rise lagging behind each instantaneous load change.
+
+    Parameters
+    ----------
+    params      : transformer parameter dict
+    profile     : hourly operating profile from load_profile()
+    dt_minutes  : time step size in minutes (default 5 min)
+
+    Returns
+    -------
+    List of dicts with keys: time_hours, load_factor, hot_spot_temp_c
+    """
+    dt_hours = dt_minutes / 60.0
+    steps_per_hour = round(1.0 / dt_hours)
+    results = []
+    prev_top_oil = None
+    prev_hot_spot = None
+
+    for row in profile:
+        load = row["load_factor"]
+        ambient = row["ambient_temp_c"]
+        hour_start = float(row["hour"])
+
+        for i in range(steps_per_hour):
+            t = hour_start + i * dt_hours
+
+            top_oil = top_oil_step(
+                params=params,
+                load_factor=load,
+                ambient_temp_c=ambient,
+                prev_top_oil_temp_c=prev_top_oil,
+                dt_hours=dt_hours,
+            )
+            hot_spot = hot_spot_step(
+                params=params,
+                load_factor=load,
+                top_oil_temp_c=top_oil,
+                prev_hot_spot_temp_c=prev_hot_spot,
+                dt_hours=dt_hours,
+            )
+
+            results.append({
+                "time_hours": t,
+                "load_factor": load,
+                "hot_spot_temp_c": hot_spot,
+            })
+
+            prev_top_oil = top_oil
+            prev_hot_spot = hot_spot
+
+    return results
+
+
 def print_summary(name: str, results: list[dict], aging: dict) -> None:
     """Print a summary table to the console."""
     print(f"\n{'=' * 65}")
@@ -150,30 +209,57 @@ def plot_results(
     power_results: list[dict],
     service_results: list[dict],
     output_path: Path,
+    power_fine: list[dict] | None = None,
+    service_fine: list[dict] | None = None,
 ) -> None:
-    """Save a two-panel plot: hot-spot with load, and thermal limit with ambient."""
+    """Save a two-panel plot: hot-spot with load, and thermal limit with ambient.
+
+    If power_fine and service_fine are provided (high-resolution simulations),
+    panel 1 uses those to show the thermal lag of hot-spot behind load changes.
+    The load is drawn as a step function so the instantaneous jump at each hour
+    boundary is clear, while the smooth hot-spot curve shows the delay.
+    """
     hours   = [r["hour"] for r in profile]
     ambient = [r["ambient_temp_c"] for r in profile]
     load    = [r["load_factor"] for r in profile]
 
-    power_hot_spot   = [r["hot_spot_temp_c"]  for r in power_results]
-    service_hot_spot = [r["hot_spot_temp_c"]  for r in service_results]
-    power_limit      = [r["thermal_limit_pu"] for r in power_results]
-    service_limit    = [r["thermal_limit_pu"] for r in service_results]
+    power_limit   = [r["thermal_limit_pu"] for r in power_results]
+    service_limit = [r["thermal_limit_pu"] for r in service_results]
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
     fig.suptitle("Transformer DTR Lite — IEEE C57.91 Example Parameters", fontsize=12)
 
     # ── Panel 1: hot-spot temperature (left) + applied load (right) ───────────
     ax1 = axes[0]
-    ax1.plot(hours, power_hot_spot,   label="Power hot-spot (25 MVA)",   color="tab:blue")
-    ax1.plot(hours, service_hot_spot, label="Service hot-spot (500 kVA)", color="tab:orange")
+
+    if power_fine is not None and service_fine is not None:
+        # Fine-resolution curves show the thermal lag clearly
+        fine_t_pwr = [r["time_hours"]    for r in power_fine]
+        fine_h_pwr = [r["hot_spot_temp_c"] for r in power_fine]
+        fine_t_svc = [r["time_hours"]    for r in service_fine]
+        fine_h_svc = [r["hot_spot_temp_c"] for r in service_fine]
+
+        ax1.plot(fine_t_pwr, fine_h_pwr, label="Power hot-spot (25 MVA)",   color="tab:blue")
+        ax1.plot(fine_t_svc, fine_h_svc, label="Service hot-spot (500 kVA)", color="tab:orange")
+
+        # Load drawn as a staircase: each hourly value is held constant until
+        # the next hour, then jumps instantaneously -- making the thermal lag
+        # of the smooth hot-spot curves visually obvious
+        ax1r = ax1.twinx()
+        ax1r.step(hours, load, where="post", color="tab:gray", linewidth=1.5,
+                  linestyle="--", label="Applied load (step)")
+    else:
+        power_hot_spot   = [r["hot_spot_temp_c"] for r in power_results]
+        service_hot_spot = [r["hot_spot_temp_c"] for r in service_results]
+        ax1.plot(hours, power_hot_spot,   label="Power hot-spot (25 MVA)",   color="tab:blue")
+        ax1.plot(hours, service_hot_spot, label="Service hot-spot (500 kVA)", color="tab:orange")
+        ax1r = ax1.twinx()
+        ax1r.plot(hours, load, color="tab:gray", linewidth=1.5, linestyle="--", label="Applied load")
+
     ax1.axhline(110, linestyle=":", color="black", linewidth=1, label="110 °C reference")
     ax1.set_ylabel("Hot-spot temperature [°C]")
     ax1.grid(True, alpha=0.3)
 
-    ax1r = ax1.twinx()
-    ax1r.plot(hours, load, color="tab:gray", linewidth=1.5, linestyle="--", label="Applied load")
     ax1r.set_ylabel("Load factor [pu]", color="tab:gray")
     ax1r.tick_params(axis="y", labelcolor="tab:gray")
     ax1r.set_ylim(0, max(load) * 1.5)
@@ -217,9 +303,13 @@ def main() -> None:
     # load 24-hour operating profile
     profile = load_profile("example_profile.csv")
 
-    # simulate both transformers
+    # simulate both transformers (hourly for summary table)
     power_results = simulate(power_params, profile)
     service_results = simulate(service_params, profile)
+
+    # high-resolution simulation (15-min steps) to visualise thermal lag in plot
+    power_fine = simulate_fine(power_params, profile, dt_minutes=15.0)
+    service_fine = simulate_fine(service_params, profile, dt_minutes=15.0)
 
     # compute loss of life over the 24-hour period
     power_aging = loss_of_life(
@@ -235,8 +325,13 @@ def main() -> None:
     print_summary("IEEE Power Transformer — 25 MVA ONAN", power_results, power_aging)
     print_summary("IEEE Service Transformer — 500 kVA ONAN", service_results, service_aging)
 
-    # save plot
-    plot_results(profile, power_results, service_results, DATA_DIR / "example_results.png")
+    # save plot (pass fine results so panel 1 shows thermal lag)
+    plot_results(
+        profile, power_results, service_results,
+        DATA_DIR / "example_results.png",
+        power_fine=power_fine,
+        service_fine=service_fine,
+    )
 
 
 if __name__ == "__main__":

@@ -63,7 +63,11 @@ def thermal_loading_limit(
     if max_top_oil_temp_c is None:
         max_top_oil_temp_c = params["max_top_oil_temp_c"]
 
-    load_factors = np.arange(search_min, search_max + search_step, search_step)
+    # Use linspace instead of arange to avoid floating-point accumulation.
+    # arange can produce values like 1.0000000000000002 which cause the
+    # temperature check to marginally exceed the limit and stop one step early.
+    n_steps = round((search_max - search_min) / search_step) + 1
+    load_factors = np.linspace(search_min, search_max, n_steps)
     last_ok = search_min
 
     for K in load_factors:
