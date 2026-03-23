@@ -151,46 +151,54 @@ def plot_results(
     service_results: list[dict],
     output_path: Path,
 ) -> None:
-    """Save a three-panel plot of temperatures, loading limits, and load profile."""
-    hours = [r["hour"] for r in profile]
+    """Save a two-panel plot: hot-spot with load, and thermal limit with ambient."""
+    hours   = [r["hour"] for r in profile]
     ambient = [r["ambient_temp_c"] for r in profile]
-    load = [r["load_factor"] for r in profile]
+    load    = [r["load_factor"] for r in profile]
 
-    power_top_oil = [r["top_oil_temp_c"] for r in power_results]
-    power_hot_spot = [r["hot_spot_temp_c"] for r in power_results]
-    power_limit = [r["thermal_limit_pu"] for r in power_results]
+    power_hot_spot   = [r["hot_spot_temp_c"]  for r in power_results]
+    service_hot_spot = [r["hot_spot_temp_c"]  for r in service_results]
+    power_limit      = [r["thermal_limit_pu"] for r in power_results]
+    service_limit    = [r["thermal_limit_pu"] for r in service_results]
 
-    service_top_oil = [r["top_oil_temp_c"] for r in service_results]
-    service_hot_spot = [r["hot_spot_temp_c"] for r in service_results]
-    service_limit = [r["thermal_limit_pu"] for r in service_results]
+    fig, axes = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+    fig.suptitle("Transformer DTR Lite — IEEE C57.91 Example Parameters", fontsize=12)
 
-    fig, axes = plt.subplots(3, 1, figsize=(10, 11), sharex=True)
+    # ── Panel 1: hot-spot temperature (left) + applied load (right) ───────────
+    ax1 = axes[0]
+    ax1.plot(hours, power_hot_spot,   label="Power hot-spot (25 MVA)",   color="tab:blue")
+    ax1.plot(hours, service_hot_spot, label="Service hot-spot (500 kVA)", color="tab:orange")
+    ax1.axhline(110, linestyle=":", color="black", linewidth=1, label="110 °C reference")
+    ax1.set_ylabel("Hot-spot temperature [°C]")
+    ax1.grid(True, alpha=0.3)
 
-    # panel 1: temperatures
-    axes[0].plot(hours, ambient, label="Ambient", color="tab:green", linestyle="--")
-    axes[0].plot(hours, power_top_oil, label="Power top-oil", color="tab:blue")
-    axes[0].plot(hours, service_top_oil, label="Service top-oil", color="tab:orange")
-    axes[0].set_ylabel("Temperature [°C]")
-    axes[0].legend(loc="upper left")
-    axes[0].set_title("Transformer DTR Lite — IEEE C57.91 Example Parameters")
-    axes[0].grid(True, alpha=0.3)
+    ax1r = ax1.twinx()
+    ax1r.plot(hours, load, color="tab:gray", linewidth=1.5, linestyle="--", label="Applied load")
+    ax1r.set_ylabel("Load factor [pu]", color="tab:gray")
+    ax1r.tick_params(axis="y", labelcolor="tab:gray")
+    ax1r.set_ylim(0, max(load) * 1.5)
 
-    # panel 2: hot-spot temperatures
-    axes[1].plot(hours, power_hot_spot, label="Power hot-spot", color="tab:blue")
-    axes[1].plot(hours, service_hot_spot, label="Service hot-spot", color="tab:orange")
-    axes[1].axhline(110, linestyle=":", color="black", linewidth=1, label="110°C reference")
-    axes[1].set_ylabel("Hot-spot [°C]")
-    axes[1].legend(loc="upper left")
-    axes[1].grid(True, alpha=0.3)
+    # combined legend from both axes
+    lines1, labels1 = ax1.get_legend_handles_labels()
+    lines1r, labels1r = ax1r.get_legend_handles_labels()
+    ax1.legend(lines1 + lines1r, labels1 + labels1r, loc="upper left", fontsize=8.5)
 
-    # panel 3: load profile vs thermal limits
-    axes[2].plot(hours, load, label="Applied load", color="tab:gray", linewidth=2)
-    axes[2].plot(hours, power_limit, label="Power thermal limit", color="tab:blue", linestyle="--")
-    axes[2].plot(hours, service_limit, label="Service thermal limit", color="tab:orange", linestyle="--")
-    axes[2].set_ylabel("Per-unit [pu]")
-    axes[2].set_xlabel("Hour of day")
-    axes[2].legend(loc="upper left")
-    axes[2].grid(True, alpha=0.3)
+    # ── Panel 2: thermal loading limit (left) + ambient temperature (right) ───
+    ax2 = axes[1]
+    ax2.plot(hours, power_limit,   label="Power thermal limit (25 MVA)",   color="tab:blue",   linestyle="--")
+    ax2.plot(hours, service_limit, label="Service thermal limit (500 kVA)", color="tab:orange", linestyle="--")
+    ax2.set_ylabel("Thermal loading limit [pu]")
+    ax2.set_xlabel("Hour of day")
+    ax2.grid(True, alpha=0.3)
+
+    ax2r = ax2.twinx()
+    ax2r.plot(hours, ambient, color="tab:green", linewidth=1.5, linestyle="-.", label="Ambient temp")
+    ax2r.set_ylabel("Ambient temperature [°C]", color="tab:green")
+    ax2r.tick_params(axis="y", labelcolor="tab:green")
+
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    lines2r, labels2r = ax2r.get_legend_handles_labels()
+    ax2.legend(lines2 + lines2r, labels2 + labels2r, loc="upper left", fontsize=8.5)
 
     plt.tight_layout()
     plt.savefig(output_path, dpi=150)
