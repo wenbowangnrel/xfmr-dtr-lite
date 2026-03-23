@@ -211,13 +211,15 @@ def plot_results(
     output_path: Path,
     power_fine: list[dict] | None = None,
     service_fine: list[dict] | None = None,
+    daily_profile: list[dict] | None = None,
+    daily_power_results: list[dict] | None = None,
+    daily_service_results: list[dict] | None = None,
 ) -> None:
-    """Save a two-panel plot: hot-spot with load, and thermal limit with ambient.
+    """Save a three-panel plot.
 
-    If power_fine and service_fine are provided (high-resolution simulations),
-    panel 1 uses those to show the thermal lag of hot-spot behind load changes.
-    The load is drawn as a step function so the instantaneous jump at each hour
-    boundary is clear, while the smooth hot-spot curve shows the delay.
+    Panel 1: hot-spot (fine resolution, step load) — shows thermal lag.
+    Panel 2: thermal loading limit + ambient — step profile.
+    Panel 3: hot-spot + load for a realistic daily variation profile.
     """
     hours   = [r["hour"] for r in profile]
     ambient = [r["ambient_temp_c"] for r in profile]
@@ -226,7 +228,10 @@ def plot_results(
     power_limit   = [r["thermal_limit_pu"] for r in power_results]
     service_limit = [r["thermal_limit_pu"] for r in service_results]
 
-    fig, axes = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+    n_panels = 3 if daily_profile is not None else 2
+    fig, axes = plt.subplots(n_panels, 1, figsize=(10, 4 * n_panels), sharex=False)
+    if n_panels == 2:
+        axes = list(axes) + [None]
     fig.suptitle("Transformer DTR Lite — IEEE C57.91 Example Parameters", fontsize=12)
 
     # ── Panel 1: hot-spot temperature (left) + applied load (right) ───────────
@@ -286,6 +291,32 @@ def plot_results(
     lines2r, labels2r = ax2r.get_legend_handles_labels()
     ax2.legend(lines2 + lines2r, labels2 + labels2r, loc="upper left", fontsize=8.5)
 
+    # ── Panel 3: daily variation — hot-spot (left) + load (right) ─────────────
+    if daily_profile is not None and daily_power_results is not None and daily_service_results is not None:
+        d_hours   = [r["hour"] for r in daily_profile]
+        d_load    = [r["load_factor"] for r in daily_profile]
+        d_pwr_hs  = [r["hot_spot_temp_c"] for r in daily_power_results]
+        d_svc_hs  = [r["hot_spot_temp_c"] for r in daily_service_results]
+
+        ax3 = axes[2]
+        ax3.plot(d_hours, d_pwr_hs, label="Power xfmr hot-spot",   color="tab:blue")
+        ax3.plot(d_hours, d_svc_hs, label="Service xfmr hot-spot", color="tab:orange")
+        ax3.axhline(110, linestyle=":", color="black", linewidth=1, label="110 °C reference")
+        ax3.set_ylabel("Hot-spot temperature [°C]")
+        ax3.set_xlabel("Hour of day")
+        ax3.grid(True, alpha=0.3)
+
+        ax3r = ax3.twinx()
+        ax3r.plot(d_hours, d_load, color="tab:gray", linewidth=1.5, linestyle="--",
+                  label="Applied load (daily)")
+        ax3r.set_ylabel("Load factor [pu]", color="tab:gray")
+        ax3r.tick_params(axis="y", labelcolor="tab:gray")
+        ax3r.set_ylim(0, max(d_load) * 1.5)
+
+        lines3, labels3 = ax3.get_legend_handles_labels()
+        lines3r, labels3r = ax3r.get_legend_handles_labels()
+        ax3.legend(lines3 + lines3r, labels3 + labels3r, loc="upper left", fontsize=8.5)
+
     plt.tight_layout()
     plt.savefig(output_path, dpi=150)
     print(f"\nPlot saved to {output_path}")
@@ -311,6 +342,11 @@ def main() -> None:
     power_fine = simulate_fine(power_params, profile, dt_minutes=15.0)
     service_fine = simulate_fine(service_params, profile, dt_minutes=15.0)
 
+    # daily variation profile (smooth ramp — realistic 24-hour operation)
+    daily_profile = load_profile("daily_profile.csv")
+    daily_power_results = simulate(power_params, daily_profile)
+    daily_service_results = simulate(service_params, daily_profile)
+
     # compute loss of life over the 24-hour period
     power_aging = loss_of_life(
         hot_spot_temps_c=[r["hot_spot_temp_c"] for r in power_results],
@@ -331,6 +367,9 @@ def main() -> None:
         DATA_DIR / "example_results.png",
         power_fine=power_fine,
         service_fine=service_fine,
+        daily_profile=daily_profile,
+        daily_power_results=daily_power_results,
+        daily_service_results=daily_service_results,
     )
 
 
