@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "transformer-dtr-lite"
+version = "0.1.0"
+description = "Lightweight IEEE C57.91 transformer thermal calculations: hot-spot temperature, thermal loading limit, and insulation aging."
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "matplotlib",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

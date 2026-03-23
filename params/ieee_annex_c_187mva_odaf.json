@@ -1,0 +1,49 @@
+{
+  "_notes": {
+    "source": "IEEE C57.91-2011 Annex C (informative), Section C.2 — Calculation determining loading beyond nameplate rating of an existing transformer",
+    "rating": "186,666 kVA at ODAF cooling (third rating of a 112,000/149,333/186,666 kVA triple-rated unit)",
+    "insulation_class": "65°C rise, thermally upgraded kraft paper insulation",
+    "normal_life_hours": "180000 hours (IEEE C57.91 Table 1)",
+    "reference_hot_spot_temp_c": "110°C for normal aging rate, thermally upgraded insulation (IEEE C57.91 Section 7)",
+    "ambient_for_example": "30°C — Annex C Section C.2 uses Theta_A = 30°C throughout"
+  },
+
+  "name": "ieee_annex_c_187mva_odaf",
+  "rated_power_kva": 186666,
+  "cooling_type": "ODAF",
+  "rated_ambient_temp_c": 30.0,
+
+  "_notes_top_oil_rise": "Delta-theta_or = 36.0 C: rated top-oil rise over ambient at full ODAF load. Stated on Annex C page 48.",
+  "top_oil_rise_c": 36.0,
+
+  "_notes_hot_spot_rise": "Delta-theta_HS,R = 28.6 C: rated hot-spot rise over top-oil at full load. Stated on Annex C page 48. Used in Equation C.4: Delta-theta_H = 28.6 * K^2.",
+  "hot_spot_rise_c": 28.6,
+
+  "_notes_thermal_time_constant": "tau_o = 3.5 h: oil thermal time constant at rated load. Stated on Annex C page 48. Used in Equation C.2.",
+  "thermal_time_constant_hours": 3.5,
+
+  "_notes_winding_time_constant": "IEEE Annex C treats the winding hot-spot gradient as instantaneous for ODAF (no winding time constant in the worked example). We set tau_w = 0.05 h (3 min) so that for any dt >= 1 min, exp(-dt / tau_w) is negligible and the step is effectively instantaneous.",
+  "winding_time_constant_hours": 0.05,
+
+  "_notes_oil_exponent": "n = 1.0 for ODAF. Annex C page 46 states explicitly: 'For the directed forced oil cooling, the n exponent is 1 and no correction of the time constant is required.' This makes tau_TO load-independent.",
+  "oil_exponent": 1.0,
+
+  "_notes_winding_exponent": "Equation C.4: Delta-theta_H = Delta-theta_HS,R * K^(2m), with m = 1 for ODAF (IEEE Table 4). So winding_exponent y = 2m = 2.",
+  "winding_exponent": 2.0,
+
+  "_notes_load_loss_ratio": "R = 4.87: ratio of load loss to no-load loss at rated current. Stated on Annex C page 48. Appears in Equation C.1: Delta-theta_TO,U = 36 * [(K^2 * 4.87 + 1) / 5.87].",
+  "load_loss_ratio": 4.87,
+
+  "_notes_hot_spot_factor": "H = 1.0 (standard multiplier on the hot-spot gradient)",
+  "hot_spot_factor": 1.0,
+
+  "_notes_k_constants": "k11 = 1.0: for ODAF (n = 1) no time-constant correction is needed, so k11 = 1. k21 = 1.0 and k22 = 1.0 because Annex C treats the winding hot-spot gradient as instantaneous — there is no two-component dynamic winding model in this example.",
+  "k11": 1.0,
+  "k21": 1.0,
+  "k22": 1.0,
+
+  "_notes_limits": "Normal hot-spot limit 110°C per IEEE C57.91 Table 3 (thermally upgraded insulation). Top-oil limit 95°C per Table 3.",
+  "max_top_oil_temp_c": 95.0,
+  "max_hot_spot_temp_c": 110.0,
+  "normal_life_hours": 180000
+}

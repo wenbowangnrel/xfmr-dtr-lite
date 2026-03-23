@@ -1,0 +1,49 @@
+{
+  "_notes": {
+    "source": "Representative IEEE C57.91-2011 values for a 500 kVA ONAN distribution/service transformer. Exponents from IEEE Table 4. Rated thermal parameters are typical for a 65 °C-rise class ONAN distribution transformer designed to reach Theta_H = 110 °C at K=1, Theta_A = 30 °C: Theta_A(30) + Delta_Theta_TO,R(55) + Delta_Theta_H,R(25) = 110 °C. These are NOT from a specific IEEE C57.91 worked example — the standard's only detailed worked example (Annex C, Section C.2) covers a 186,666 kVA ODAF power transformer.",
+    "rating": "500 kVA, 12.47 kV / 120/240 V",
+    "cooling_type_note": "ONAN: Oil Natural Air Natural. Passive natural convection — no pumps or fans. Cooling exponents n=0.8 and m=0.8 from IEEE C57.91-2011 Table 4.",
+    "normal_life_hours": "180000 hours (IEEE C57.91 Table 1, thermally upgraded kraft paper insulation)",
+    "reference_hot_spot_temp_c": "110 °C is the reference temperature for normal aging rate per IEEE C57.91 Section 7. Calibrated for ONAN transformers at rated load (K=1) in 30 °C ambient.",
+    "time_constant_note": "tau_o = 1.5 h. Distribution transformers respond faster than large power transformers because they have less oil volume (thermal mass C) relative to their losses. IEEE C57.91 Eq. 14: tau_TO,R = C * Delta_Theta_TO,R / P_T,R. For a 500 kVA unit C is small, giving tau in the 1.0-2.0 h range. Effective time constant = k11 * tau_o = 0.5 * 1.5 = 0.75 h."
+  },
+
+  "name": "ieee_service_transformer_500kva",
+  "rated_power_kva": 500,
+  "cooling_type": "ONAN",
+  "rated_ambient_temp_c": 30.0,
+
+  "_notes_top_oil_rise": "Delta_Theta_TO,R = 55 °C: rated top-oil rise over ambient at full load. Typical for a 500 kVA ONAN distribution transformer. Distribution units tend to run with similar or slightly higher top-oil rise than large ONAN power transformers because they have less surface area per kVA for heat dissipation.",
+  "top_oil_rise_c": 55.0,
+
+  "_notes_hot_spot_rise": "Delta_Theta_H,R = 25 °C: rated hot-spot rise over top-oil at full load. Together with top_oil_rise_c: Theta_H,SS = 30 + 55 + 25 = 110 °C at K=1, the IEEE reference design point for ONAN (F_AA = 1.0 at rated load).",
+  "hot_spot_rise_c": 25.0,
+
+  "_notes_thermal_time_constant": "tau_o = 1.5 h: oil thermal time constant. Distribution transformers have less oil volume (thermal mass C) relative to their losses than large power transformers, so they respond faster. Typical published range for 500 kVA ONAN units is 1.0-2.0 h. IEEE C57.91 Eq. 14: tau_TO,R = C * Delta_Theta_TO,R / P_T,R. Effective time constant = k11 * tau_o = 0.5 * 1.5 = 0.75 h.",
+  "thermal_time_constant_hours": 1.5,
+
+  "_notes_winding_time_constant": "tau_w = 0.067 h (4 min): winding thermal time constant. Very short for distribution transformers due to small winding mass and short heat path from conductor to oil.",
+  "winding_time_constant_hours": 0.067,
+
+  "_notes_oil_exponent": "n = 0.8 for ONAN (IEEE C57.91-2011 Table 4). Controls how top-oil rise scales with load. For n < 1 (ONAN), the cooling is sub-linear. k11 = 0.5 is required to correct the linearised time-constant model for this nonlinearity.",
+  "oil_exponent": 0.8,
+
+  "_notes_winding_exponent": "y = 2m = 1.6 for ONAN (IEEE C57.91-2011 Table 4: m = 0.8 for ONAN). Controls how the hot-spot gradient above top-oil scales with load: Delta_Theta_H = Delta_Theta_H,R * K^y. y = 2m = 2*0.8 = 1.6.",
+  "winding_exponent": 1.6,
+
+  "_notes_load_loss_ratio": "R = 5.0: ratio of load loss to no-load loss at rated current. Distribution transformers have proportionally larger no-load losses than power transformers, giving a lower R.",
+  "load_loss_ratio": 5.0,
+
+  "_notes_hot_spot_factor": "H = 1.0: hot-spot factor, standard multiplier on the hot-spot gradient.",
+  "hot_spot_factor": 1.0,
+
+  "_notes_k_constants": "k11 = 0.5: required for all cooling modes with n < 1 (ONAN). IEEE C57.91 Section 7.2.1 — k11 corrects the linearised exponential model for the nonlinear ONAN thermal response where cooling power increases with temperature (natural convection). Setting k11 = 1.0 for ONAN is incorrect; that value is only valid for ODAF (n = 1.0) where no correction is needed. k21 = 1.0, k22 = 1.0: IEEE C57.91 Annex C simplified single-component winding model.",
+  "k11": 0.5,
+  "k21": 1.0,
+  "k22": 1.0,
+
+  "_notes_limits": "Normal loading limits per IEEE C57.91-2011 Table 3 (thermally upgraded insulation).",
+  "max_top_oil_temp_c": 95.0,
+  "max_hot_spot_temp_c": 110.0,
+  "normal_life_hours": 180000
+}

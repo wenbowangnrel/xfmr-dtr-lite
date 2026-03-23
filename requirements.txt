@@ -1,0 +1,9 @@
+# Core runtime dependencies (also declared in pyproject.toml)
+numpy>=1.24
+matplotlib>=3.6
+
+# Notebook dependencies (validation_with_IEEE_std.ipynb)
+jupyter>=1.0
+nbconvert>=7.0
+nbformat>=5.9
+ipykernel>=6.0

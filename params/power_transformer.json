@@ -1,0 +1,48 @@
+{
+  "_notes": {
+    "source": "Representative IEEE C57.91-2011 values for a 25 MVA ONAN large power transformer. Exponents from IEEE Table 4. Rated thermal parameters (top_oil_rise_c, hot_spot_rise_c) are typical for a 65 °C-rise class ONAN power transformer designed to reach Theta_H = 110 °C at K=1, Theta_A = 30 °C: Theta_A(30) + Delta_Theta_TO,R(55) + Delta_Theta_H,R(25) = 110 °C.",
+    "rating": "25 MVA, 115/12.47 kV",
+    "cooling_type_note": "ONAN: Oil Natural Air Natural. Passive natural convection — no pumps or fans. Cooling exponents n=0.8 and m=0.8 from IEEE C57.91-2011 Table 4.",
+    "normal_life_hours": "180000 hours (IEEE C57.91 Table 1, thermally upgraded kraft paper insulation)",
+    "reference_hot_spot_temp_c": "110 °C is the reference temperature for normal aging rate per IEEE C57.91 Section 7. Calibrated for ONAN transformers at rated load (K=1) in 30 °C ambient."
+  },
+
+  "name": "ieee_power_transformer_25mva",
+  "rated_power_kva": 25000,
+  "cooling_type": "ONAN",
+  "rated_ambient_temp_c": 30.0,
+
+  "_notes_top_oil_rise": "Delta_Theta_TO,R = 55 °C: rated top-oil rise over ambient at full load. Typical for a 65 °C-rise class ONAN large power transformer. ONAN units run with higher oil temperature rise than forced-cooled units because natural convection is a weaker heat transfer mechanism.",
+  "top_oil_rise_c": 55.0,
+
+  "_notes_hot_spot_rise": "Delta_Theta_H,R = 25 °C: rated hot-spot rise over top-oil at full load. Together with top_oil_rise_c: Theta_H,SS = 30 + 55 + 25 = 110 °C at K=1. This is the IEEE reference design point for ONAN (F_AA = 1.0 at rated load).",
+  "hot_spot_rise_c": 25.0,
+
+  "_notes_thermal_time_constant": "tau_o = 3.5 h: oil thermal time constant at rated load. Large power transformers have more oil volume (thermal mass C) relative to their losses than distribution transformers, giving longer time constants. IEEE C57.91 Eq. 14: tau_TO,R = C * Delta_Theta_TO,R / P_T,R.",
+  "thermal_time_constant_hours": 3.5,
+
+  "_notes_winding_time_constant": "tau_w = 0.167 h (10 min): winding thermal time constant. For ONAN large power transformers the winding time constant is not negligible — natural convection removes heat from the winding surface slowly, so the conductor temperature gradient above the oil takes several minutes to stabilize after a load change.",
+  "winding_time_constant_hours": 0.167,
+
+  "_notes_oil_exponent": "n = 0.8 for ONAN (IEEE C57.91-2011 Table 4). Controls how the top-oil rise scales with load: Delta_Theta_TO = Delta_Theta_TO,R * ((1 + R*K^2)/(1 + R))^n. For n < 1 (ONAN), the top-oil response is sub-linear — cooling strengthens as temperature rises (natural convection). k11 = 0.5 corrects the linearised time-constant model for this nonlinearity.",
+  "oil_exponent": 0.8,
+
+  "_notes_winding_exponent": "y = 2m = 1.6 for ONAN (IEEE C57.91-2011 Table 4: m = 0.8 for ONAN). Controls how the hot-spot gradient above top-oil scales with load: Delta_Theta_H = Delta_Theta_H,R * K^y. y = 2m = 2*0.8 = 1.6.",
+  "winding_exponent": 1.6,
+
+  "_notes_load_loss_ratio": "R = 6.0: ratio of load loss to no-load loss at rated current. Typical for a 25 MVA ONAN power transformer. Appears in the top-oil rise equation: Delta_Theta_TO,U = Delta_Theta_TO,R * ((K^2*R + 1)/(R + 1))^n.",
+  "load_loss_ratio": 6.0,
+
+  "_notes_hot_spot_factor": "H = 1.0: hot-spot factor, standard multiplier on the hot-spot gradient. Set to 1.0 when using nameplate-derived parameters.",
+  "hot_spot_factor": 1.0,
+
+  "_notes_k_constants": "k11 = 0.5: required for all cooling modes with n < 1 (ONAN, ONAF). IEEE C57.91 Section 7.2.1 — the k11 factor corrects the linearised exponential model for the nonlinear ONAN thermal response. For n = 1 (ODAF) k11 = 1.0 (no correction needed). k21 = 1.0, k22 = 1.0: IEEE C57.91 Annex C uses the simplified single-component winding model (no overshoot). k21 = 2.0 and k22 = 2.0 are IEC 60076-7 parameters and do not belong in a pure IEEE C57.91 model.",
+  "k11": 0.5,
+  "k21": 1.0,
+  "k22": 1.0,
+
+  "_notes_limits": "Normal loading limits per IEEE C57.91-2011 Table 3 (thermally upgraded insulation).",
+  "max_top_oil_temp_c": 95.0,
+  "max_hot_spot_temp_c": 110.0,
+  "normal_life_hours": 180000
+}

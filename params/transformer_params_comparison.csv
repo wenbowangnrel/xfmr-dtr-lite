@@ -1,0 +1,18 @@
+Parameter,25 MVA Power,500 kVA Service,50 kVA Service,187 MVA ODAF (Annex C)
+Rated power (kVA),25000,500,50,186666
+Cooling type,ONAN,ONAN,ONAN,ODAF
+Rated ambient (°C),30.0,30.0,30.0,30.0
+"ΔΘ_TO,R (°C)",55.0,55.0,55.0,36.0
+"ΔΘ_H,R (°C)",25.0,25.0,25.0,28.6
+"τ_TO,R (h)",3.5,1.5,0.75,3.5
+τ_w (h),0.167,0.067,0.033,0.05
+n — oil exponent,0.8,0.8,0.8,1.0
+y=2m — winding exponent,1.6,1.6,1.6,2.0
+R — load loss ratio,6.0,5.0,4.0,4.87
+H — hot-spot factor,1.0,1.0,1.0,1.0
+k11,0.5,0.5,0.5,1.0
+k21,1.0,1.0,1.0,1.0
+k22,1.0,1.0,1.0,1.0
+Max top-oil (°C),95.0,95.0,95.0,95.0
+Max hot-spot (°C),110.0,110.0,110.0,110.0
+Normal life (h),180000,180000,180000,180000
