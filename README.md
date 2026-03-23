@@ -101,30 +101,6 @@ RMS error vs IEEE Table C.1: **0.13 °C** (systematic positive bias from rounded
 
 ---
 
-## Thermal model overview
-
-The model implements the IEEE Annex C exponential difference equations. At each time step:
-
-```
-ΔΘ_TO,U = ΔΘ_TO,R × ((K²R + 1) / (R + 1))ⁿ        # ultimate top-oil rise
-Θ_TO(t) = Θ_TO(t-1) + [1 - exp(-dt / (k11 × τ))] × (Θ_TO,U - Θ_TO(t-1))
-
-ΔΘ_H,U  = ΔΘ_H,R × K^y                              # ultimate hot-spot gradient
-Θ_H(t)  = Θ_TO(t) + gradient(t)                      # hot-spot temperature
-
-F_AA    = exp(15000/383 - 15000/(Θ_H + 273))         # aging rate (= 1.0 at 110 °C)
-```
-
-Where:
-- `K` = load factor (per unit)
-- `R` = load loss ratio
-- `n` = oil exponent (0.8 ONAN, 1.0 ODAF)
-- `y = 2m` = winding exponent (1.6 ONAN, 2.0 ODAF)
-- `k11` = time-constant correction (0.5 ONAN, 1.0 ODAF)
-- `τ` = oil thermal time constant (hours)
-
----
-
 ## Project structure
 
 ```
