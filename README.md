@@ -1,8 +1,8 @@
-# transformer-dtr-lite
+# xfmr-dtr-lite
 
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](LICENSE)
 
-A lightweight Python implementation of the **IEEE C57.91-2011** thermal model for mineral-oil-immersed transformers. Computes top-oil temperature, hot-spot temperature, insulation aging rate, and thermal loading limit using the Annex C difference equations.
+A lightweight Python implementation of the **IEEE C57.91-2011** dynamic thermal rating model for mineral-oil-immersed transformers. Computes top-oil temperature, hot-spot temperature, insulation aging rate, and thermal loading limit using the Annex C difference equations.
 
 ---
 
