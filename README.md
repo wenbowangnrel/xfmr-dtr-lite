@@ -38,7 +38,7 @@ pip install -r requirements.txt
 
 ```python
 import json
-from transformer_dtr_lite import top_oil_step, hot_spot_step, aging_rate
+from transformer_dtr_lite import top_oil_step, hot_spot_step, aging_rate, thermal_loading_limit
 
 # load transformer parameters
 with open("params/service_transformer.json") as f:
@@ -49,10 +49,12 @@ top_oil  = top_oil_step(params, load_factor=0.8, ambient_temp_c=30.0,
                          prev_top_oil_temp_c=30.0, dt_hours=1.0)
 hot_spot = hot_spot_step(params, load_factor=0.8, top_oil_temp_c=top_oil,
                           prev_hot_spot_temp_c=30.0, dt_hours=1.0)
+limit    = thermal_loading_limit(params, ambient_temp_c=30.0)
 
-print(f"Top-oil:  {top_oil:.1f} °C")
-print(f"Hot-spot: {hot_spot:.1f} °C")
-print(f"F_AA:     {aging_rate(hot_spot):.4f}")
+print(f"Top-oil:        {top_oil:.1f} °C")
+print(f"Hot-spot:       {hot_spot:.1f} °C")
+print(f"F_AA:           {aging_rate(hot_spot):.4f}")
+print(f"Thermal limit:  {limit:.2f} pu")
 ```
 
 Run the full 24-hour example:
