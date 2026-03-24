@@ -4,6 +4,10 @@
 
 A lightweight Python implementation of the **IEEE C57.91-2011** dynamic thermal rating model for mineral-oil-immersed transformers. Computes top-oil temperature, hot-spot temperature, insulation aging rate, and thermal loading limit using the Annex C difference equations.
 
+To be included in
+
+**Grid TRACE** : **Grid** **T**hermal **R**ating and **A**sset **C**apacity **E**valuation
+
 ---
 
 ## What it does
